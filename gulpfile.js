@@ -1,13 +1,18 @@
 var gulp = require('gulp');
 var connect = require('gulp-connect'); //Runs a local dev server
 var open = require('gulp-open'); //Open a URL in a web browser
+var browserify = require('browserify'); // Bundles JS
+var reactify = require('reactify'); // Transform JSX to JS
+var source = require('vinyl-source-stream'); // Use Conventional Streams with Gulp
 
 var config = {
 	port: 9005,
 	devBaseUrl: 'http://localhost',
 	paths: {
 		html: './src/*.html',
-		dist: './dist'
+		js: './src/**/*.js',
+		dist: './dist',
+		mainJS: './src/main.js'
 	}
 };
 
@@ -33,10 +38,31 @@ gulp.task('html', function() {
 		.pipe(connect.reload());
 });
 
-// Listen to all html files for any changes
-// Passing the html task
-gulp.task('watch', function(){
-	gulp.watch(config.paths.html, ['html']);
+/**
+ *  JS Task : Transform JSX to JS using reactify module
+ *  if there's an error while tronsforming, print it in console
+ *  combine all JSX, JS files to a single js file (bundle.js)
+ *  Move bundle.js to dist folder
+ *  Reload app to have the latest update of js code.a
+ */
+gulp.task('js', function(){
+	browserify(config.paths.mainJS).transform(reactify)
+								   .bundle()
+								   .on('error', console.error.bind(console))
+								   .pipe(source('bundle.js'))
+								   .pipe(gulp.dest(config.paths.dist+'/scripts'))
+								   .pipe(connect.reload());
 });
 
-gulp.task('default', ['html', 'open', 'watch']);
+/**
+ * 1. Listen to any change on HTML Files
+ *    fire the HTML task after change event
+ * 2. Listen to any change on JS Files
+ *    fire the JS task after change event
+ */
+gulp.task('watch', function(){
+	gulp.watch(config.paths.html, ['html']);
+	gulp.watch(config.paths.js, ['js']);
+});
+
+gulp.task('default', ['html','js', 'open', 'watch']);
