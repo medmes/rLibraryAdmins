@@ -33,4 +33,10 @@ gulp.task('html', function() {
 		.pipe(connect.reload());
 });
 
-gulp.task('default', ['html', 'open']);
+// Listen to all html files for any changes
+// Passing the html task
+gulp.task('watch', function(){
+	gulp.watch(config.paths.html, ['html']);
+});
+
+gulp.task('default', ['html', 'open', 'watch']);
