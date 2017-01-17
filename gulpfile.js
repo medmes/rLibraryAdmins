@@ -5,6 +5,7 @@ var browserify = require('browserify'); // Bundles JS
 var reactify = require('reactify'); // Transform JSX to JS
 var source = require('vinyl-source-stream'); // Use Conventional Streams with Gulp
 var concat = require('gulp-concat'); // concatenates files
+var eslint = require('gulp-eslint'); // Lint JS files, includinf JSX
 
 var config = {
 	port: 9005,
@@ -72,14 +73,25 @@ gulp.task('css', function(){
 });
 
 /**
+ * eslint task ;
+ * Configure eslint for adding rules lint to project
+ */
+gulp.task('lint', function(){
+	return gulp.src(config.paths.js)
+			   .pipe(eslint({configFile: 'eslint.config.json'}))
+		       .pipe(eslint.format());
+});
+
+/**
  * 1. Listen to any change on HTML Files
  *    fire the HTML task after change event
  * 2. Listen to any change on JS Files
  *    fire the JS task after change event
+ * 3. Once JS files has been changed, run lint task again
  */
 gulp.task('watch', function(){
 	gulp.watch(config.paths.html, ['html']);
-	gulp.watch(config.paths.js, ['js']);
+	gulp.watch(config.paths.js, ['js', 'lint']);
 });
 
-gulp.task('default', ['html','js', 'css', 'open', 'watch']);
+gulp.task('default', ['html','js', 'css', 'lint', 'open', 'watch']);
