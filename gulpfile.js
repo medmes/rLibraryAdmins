@@ -13,9 +13,11 @@ var config = {
 	paths: {
 		html: './src/*.html',
 		js: './src/**/*.js',
+		images: './src/images/*',
 		css: [
 			'node_modules/bootstrap/dist/css/bootstrap.min.css',
-			'node_modules/bootstrap/dist/css/bootstrap-theme.min.css'
+			'node_modules/bootstrap/dist/css/bootstrap-theme.min.css',
+			'./src/components/common/css/common.css'
 		],
 		dist: './dist',
 		mainJS: './src/main.js'
@@ -69,7 +71,8 @@ gulp.task('js', function(){
 gulp.task('css', function(){
 	gulp.src(config.paths.css)
 		.pipe(concat('bundle.css'))
-		.pipe(gulp.dest(config.paths.dist+'/css'));
+		.pipe(gulp.dest(config.paths.dist+'/css'))
+		.pipe(connect.reload());
 });
 
 /**
@@ -83,6 +86,20 @@ gulp.task('lint', function(){
 });
 
 /**
+ * Images Task :
+ * load all images located in src/images folder
+ * move to dist folder
+ */
+gulp.task('images', function(){
+	gulp.src(config.paths.images)
+		.pipe(gulp.dest(config.paths.dist+'/images'))
+		.pipe(connect.reload());
+
+	//Publish favicon
+	gulp.src('./src/favicon.ico')
+		.pipe(gulp.dest(config.paths.dist));
+});
+/**
  * 1. Listen to any change on HTML Files
  *    fire the HTML task after change event
  * 2. Listen to any change on JS Files
@@ -92,6 +109,7 @@ gulp.task('lint', function(){
 gulp.task('watch', function(){
 	gulp.watch(config.paths.html, ['html']);
 	gulp.watch(config.paths.js, ['js', 'lint']);
+	gulp.watch(config.paths.css, ['css']);
 });
 
-gulp.task('default', ['html','js', 'css', 'lint', 'open', 'watch']);
+gulp.task('default', ['html','js', 'css', 'images', 'lint', 'open', 'watch']);
