@@ -4,8 +4,11 @@
   "description": "Library Administration built using React/Flux",
   "main": "index.js",
   "dependencies": {
+    "babel-core": "^6.22.1",
+    "babel-eslint": "^7.1.1",
     "bootstrap": "^3.3.7",
     "browserify": "^13.3.0",
+    "eslint": "^3.13.1",
     "eslint-plugin-react": "^6.9.0",
     "flux": "^3.1.2",
     "gulp": "^3.9.1",
